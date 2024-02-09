@@ -1,4 +1,4 @@
-# Tetris in C
+# Tetris in WASM
 
 Simple clone of the tetris game in C.
 
@@ -7,11 +7,12 @@ efficient as possible. The game has a 12x8 board which is stored in only 12
 bytes using a `char[12]`. Also all the pieces are stored as `int`. The goal of
 the project is to learn bitwise operations and understand the memory layout.
 
-### Quickstart
+## Quickstart
 
 Use `a-d` to move and `q` to quit. No rotation or fast move supported.
 
 ```console
-gcc main.c -o main
-./main
+make
+python -m http.server
+# open the browser at localhost:8000
 ```

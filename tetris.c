@@ -12,15 +12,17 @@ const int pieces[] = {
 };
 #define PIECE_COUNT (sizeof(pieces) / sizeof(pieces[0]))
 
-void tetris_init(struct tetris *t) {
+int tetris_init(struct tetris *t) {
     for (int i = 0; i < BOARD_HEIGHT + BOARD_BUFFER; i++) {
         t->board[i] = 0;
     }
     t->score = 0;
+
+    return 0;
 }
 
 int tetris_spawn(struct tetris *t) {
-    int piece = pieces[tetris_rand_int() % PIECE_COUNT];
+    int piece = pieces[tetris_rand_int(PIECE_COUNT)];
 
     int is_occupied = t->board[0] & piece | t->board[1] & (piece >> 8) |
                       t->board[2] & (piece >> 16) | t->board[3] & (piece >> 24);
@@ -32,7 +34,7 @@ int tetris_spawn(struct tetris *t) {
     return is_occupied;
 }
 
-void tetris_tick(struct tetris *t, enum move m) {
+int tetris_tick(struct tetris *t, enum move m) {
     int can_move = 1;
 
     for (int i = BOARD_HEIGHT + BOARD_BUFFER - 2; i >= 0; i--) {
@@ -88,4 +90,6 @@ void tetris_tick(struct tetris *t, enum move m) {
         }
     }
     t->score += count * count;
+
+    return 0;
 }

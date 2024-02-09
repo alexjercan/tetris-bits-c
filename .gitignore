@@ -1,3 +1,4 @@
 main
 main.o
 tetris.o
+tetris.wasm

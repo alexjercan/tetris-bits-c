@@ -6,8 +6,8 @@
 #include <unistd.h>
 #include "tetris.h"
 
-int tetris_rand_int() {
-    return rand();
+int tetris_rand_int(int max) {
+    return rand() % max;
 }
 
 const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
