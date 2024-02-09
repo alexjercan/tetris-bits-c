@@ -34,7 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Create the dist package
-      - run: |
+        run: |
             mkdir -p dist
             clang --target=wasm32 --no-standard-libraries -Wl,--export-all \
               -Wl,--allow-undefined -Wl,--no-entry -o dist/tetris.wasm tetris.c
