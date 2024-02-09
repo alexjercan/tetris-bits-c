@@ -48,6 +48,8 @@ function render(tetris) {
     const ctx = canvas.getContext('2d');
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#f0f0f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for (let i = BUFFER; i < HEIGHT + BUFFER; i++) {
         let line = tetris.board[i];
