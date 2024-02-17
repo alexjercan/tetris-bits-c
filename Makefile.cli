@@ -1,0 +1,33 @@
+CC=clang
+BUILD_DIR=dist
+CFLAGS=-O2 -Wall -Wextra -Werror
+
+.PHONY: clean all
+
+all: $(BUILD_DIR)/cli
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+TETRIS_DIR = src/tetris
+TETRIS_SRCS = $(wildcard $(TETRIS_DIR)/*.c)
+TETRIS_INCS = $(wildcard $(TETRIS_DIR)/*.h)
+TETRIS_OBJS = $(patsubst $(TETRIS_DIR)/%.c,$(BUILD_DIR)/%.o,$(TETRIS_SRCS))
+
+$(BUILD_DIR)/%.o: $(TETRIS_DIR)/%.c $(TETRIS_INCS) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+CLI_DIR=src/cli
+CLI_SRCS = $(wildcard $(CLI_DIR)/*.c)
+CLI_INCS = $(wildcard $(CLI_DIR)/*.h)
+CLI_OBJS = $(patsubst $(CLI_DIR)/%.c,$(BUILD_DIR)/%.o,$(CLI_SRCS))
+CLI_CFLAGS = -I$(TETRIS_DIR)
+
+$(BUILD_DIR)/%.o: $(CLI_DIR)/%.c $(CLI_INCS) | $(BUILD_DIR)
+	$(CC) $(CLI_CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/cli: $(CLI_OBJS) $(TETRIS_OBJS)
+	$(CC) $(CFLAGS) $(CLI_CFLAGS) $(CLI_OBJS) $(TETRIS_OBJS) -o $(BUILD_DIR)/cli

@@ -1,7 +1,7 @@
 #include "tetris.h"
 
 const int pieces[] = {
-    0 | (0 << 8) | (0b00011000 << 16) | (0b00011000 << 24),          // O
+    0 | (0 << 8) | (0b00011000 << 16) | (0b00011000 << 24), // O
     0b00001000 | (0b00001000 << 8) | (0b00001000 << 16) |
         (0b00001000 << 24),                                          // I
     0 | (0 << 8) | (0b00011000 << 16) | (0b00001100 << 24),          // S
@@ -24,8 +24,9 @@ int tetris_init(struct tetris *t) {
 int tetris_spawn(struct tetris *t) {
     int piece = pieces[tetris_rand_int(PIECE_COUNT)];
 
-    int is_occupied = t->board[0] & piece | t->board[1] & (piece >> 8) |
-                      t->board[2] & (piece >> 16) | t->board[3] & (piece >> 24);
+    int is_occupied = (t->board[0] & piece) | (t->board[1] & (piece >> 8)) |
+                      (t->board[2] & (piece >> 16)) |
+                      (t->board[3] & (piece >> 24));
 
     for (int i = 0; i < BOARD_BUFFER; i++) {
         t->board[i] = (piece >> (i * 8)) & 0b11111111;

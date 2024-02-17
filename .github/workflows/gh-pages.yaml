@@ -34,11 +34,7 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Create the dist package
-        run: |
-            mkdir -p dist
-            clang --target=wasm32 --no-standard-libraries -Wl,--export-all \
-              -Wl,--allow-undefined -Wl,--no-entry -o dist/tetris.wasm tetris.c
-            cp index.html index.js dist/
+        run: make -f Makefile.web
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:

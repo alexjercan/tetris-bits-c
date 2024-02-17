@@ -1,19 +1,15 @@
-all: main tetris.wasm
+.PHONY: clean web all
 
-main: main.o tetris.o
-	clang -o main main.o tetris.o
+MAKE = make
 
-main.o: main.c
-	clang -c main.c
+all: clean cli web
 
-tetris.o: tetris.c
-	clang -c tetris.c
+cli:
+	$(MAKE) -f Makefile.cli
 
-tetris.wasm: tetris.c
-	clang --target=wasm32 --no-standard-libraries -Wl,--export-all \
-		-Wl,--allow-undefined -Wl,--no-entry -o tetris.wasm tetris.c
-
-.PHONY: clean
+web:
+	$(MAKE) -f Makefile.web
 
 clean:
-	rm -f main main.o tetris.o
+	$(MAKE) -f Makefile.cli clean
+	$(MAKE) -f Makefile.web clean

@@ -1,0 +1,29 @@
+CC=clang
+BUILD_DIR=dist
+CFLAGS=-O2 -Wall -Wextra -Werror
+
+.PHONY: clean web all
+
+all: web
+
+clean:
+	rm -rf $(BUILD_DIR)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+TETRIS_DIR = src/tetris
+TETRIS_SRCS = $(wildcard $(TETRIS_DIR)/*.c)
+TETRIS_INCS = $(wildcard $(TETRIS_DIR)/*.h)
+TETRIS_OBJS = $(patsubst $(TETRIS_DIR)/%.c,$(BUILD_DIR)/%.o,$(TETRIS_SRCS))
+
+WEB_DIR=src/web
+WEB_FILES = $(wildcard $(WEB_DIR)/*)
+TETRIS_WASM = $(BUILD_DIR)/tetris.wasm
+WEB_CFLAGS = -target wasm32 -nostdlib -Wl,--export-all -Wl,--allow-undefined -Wl,--no-entry
+
+$(BUILD_DIR)/tetris.wasm: $(TETRIS_SRCS) $(TETRIS_INCS) | $(BUILD_DIR)
+	clang $(CFLAGS) $(WEB_CFLAGS) $(TETRIS_SRCS) -o $(BUILD_DIR)/tetris.wasm
+
+web: $(TETRIS_WASM) | $(BUILD_DIR)
+	cp $(WEB_FILES) $(BUILD_DIR)
