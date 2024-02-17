@@ -27,7 +27,7 @@ void tetris_print(struct tetris *t) {
     }
 }
 
-void *input_thread(void *arg) {
+void *input_thread() {
     for (;;) {
         input = getchar();
 
@@ -49,7 +49,6 @@ int main() {
     struct tetris t;
     tetris_init(&t);
 
-    int i = 0;
     while (1) {
         struct tetris tmp = t;
 

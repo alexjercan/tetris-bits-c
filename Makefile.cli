@@ -27,7 +27,7 @@ CLI_OBJS = $(patsubst $(CLI_DIR)/%.c,$(BUILD_DIR)/%.o,$(CLI_SRCS))
 CLI_CFLAGS = -I$(TETRIS_DIR)
 
 $(BUILD_DIR)/%.o: $(CLI_DIR)/%.c $(CLI_INCS) | $(BUILD_DIR)
-	$(CC) $(CLI_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(CLI_CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/cli: $(CLI_OBJS) $(TETRIS_OBJS)
 	$(CC) $(CFLAGS) $(CLI_CFLAGS) $(CLI_OBJS) $(TETRIS_OBJS) -o $(BUILD_DIR)/cli
