@@ -24,8 +24,10 @@ struct tetris tmp;
 struct led_controller controller;
 
 int main() {
+    // TODO: Setup the board with all components
     int is_game_over = 0;
 
+    // TODO: Make this work with multiple devices
     lc_init(&controller, &DDRB, &PORTB, DIN_PIN, CS_PIN, CLK_PIN, NUM_DEVICES,
             buffer);
 
@@ -38,6 +40,7 @@ int main() {
     while (1) {
         tmp = t;
 
+        // TODO: Get movement from buttons
         enum move m = MOVE_NONE;
         if (tetris_rand_int(2) == 0) {
             m = MOVE_LEFT;
