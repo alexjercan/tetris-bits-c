@@ -1,6 +1,6 @@
 .PHONY: clean web all
 
-MAKE = make
+MAKE=make
 
 all: clean cli web
 

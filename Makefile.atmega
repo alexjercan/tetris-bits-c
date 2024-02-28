@@ -15,24 +15,18 @@ clean:
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-TETRIS_DIR = src/tetris
-TETRIS_SRCS = $(wildcard $(TETRIS_DIR)/*.c)
-TETRIS_INCS = $(wildcard $(TETRIS_DIR)/*.h)
-TETRIS_OBJS = $(patsubst $(TETRIS_DIR)/%.c,$(BUILD_DIR)/%_avr.o,$(TETRIS_SRCS))
-
-$(BUILD_DIR)/%_avr.o: $(TETRIS_DIR)/%.c $(TETRIS_INCS) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-
 ATMEGA_DIR=src/atmega
+TETRIS_DIR = src/tetris
+TETRIS_HDR = $(TETRIS_DIR)/tetris.h
 ATMEGA_SRCS = $(wildcard $(ATMEGA_DIR)/*.c)
 ATMEGA_INCS = $(wildcard $(ATMEGA_DIR)/*.h)
 ATMEGA_OBJS = $(patsubst $(ATMEGA_DIR)/%.c,$(BUILD_DIR)/%_avr.o,$(ATMEGA_SRCS))
 
-$(BUILD_DIR)/%_avr.o: $(ATMEGA_DIR)/%.c $(ATMEGA_INCS) | $(BUILD_DIR)
+$(BUILD_DIR)/%_avr.o: $(ATMEGA_DIR)/%.c $(ATMEGA_INCS) $(TETRIS_HDR) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -I$(TETRIS_DIR) -c $< -o $@
 
-$(BUILD_DIR)/tetris.elf: $(ATMEGA_OBJS) $(TETRIS_OBJS)
-	$(CC) $(CFLAGS) $(ATMEGA_OBJS) $(TETRIS_OBJS) -o $(BUILD_DIR)/tetris.elf
+$(BUILD_DIR)/tetris.elf: $(ATMEGA_OBJS)
+	$(CC) $(CFLAGS) $(ATMEGA_OBJS) -o $(BUILD_DIR)/tetris.elf
 
 $(BUILD_DIR)/tetris.hex: $(BUILD_DIR)/tetris.elf
 	avr-objcopy -j .text -j .data -O ihex  $(BUILD_DIR)/tetris.elf $(BUILD_DIR)/tetris.hex

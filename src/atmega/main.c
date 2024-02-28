@@ -1,4 +1,6 @@
-#define BOARD_HEIGHT 8
+#include <string.h>
+#define BOARD_HEIGHT 16
+#define TETRIS_IMPLEMENTATION
 #include "tetris.h"
 #include <avr/io.h>
 #include <stdint.h>
@@ -9,7 +11,7 @@
 #define CS_PIN PB3
 #define CLK_PIN PB4
 
-#define NUM_DEVICES 1
+#define NUM_DEVICES (BOARD_HEIGHT / 8)
 
 uint8_t buffer[2 * NUM_DEVICES];
 
@@ -170,29 +172,53 @@ void led_controller_set_row(struct led_controller *controller, uint8_t addr,
 
 int tetris_rand_int(int max) { return rand() % max; }
 
+struct tetris t;
+struct tetris tmp;
+struct led_controller controller;
+
 int main() {
     int is_game_over = 0;
 
-    struct tetris t;
-    tetris_init(&t);
-
-    struct led_controller controller;
     led_controller_init(&controller, &DDRB, &PORTB, DIN_PIN, CS_PIN, CLK_PIN,
                         NUM_DEVICES, buffer);
 
-    led_controller_shutdown(&controller, 0, 0);
-    led_controller_set_intensity(&controller, 0, 8);
-    led_controller_clear_display(&controller, 0);
-
-    is_game_over = tetris_spawn(&t);
-    for (int i = 0; i < BOARD_BUFFER; i++) {
-        led_controller_set_row(&controller, 0, i, t.board[i]);
+    for (int i = 0; i < NUM_DEVICES; i++) {
+        led_controller_shutdown(&controller, i, 0);
+        led_controller_set_intensity(&controller, i, 8);
+        led_controller_clear_display(&controller, i);
     }
 
+    tetris_init(&t);
+
     while (1) {
-        is_game_over = tetris_spawn(&t);
-        for (int i = 0; i < BOARD_BUFFER; i++) {
-            led_controller_set_row(&controller, 0, i, t.board[i]);
+        tmp = t;
+
+        enum move m = MOVE_NONE;
+        if (tetris_rand_int(2) == 0) {
+            m = MOVE_LEFT;
+        } else {
+            m = MOVE_RIGHT;
+        }
+        tetris_tick(&t, m);
+
+        if (memcmp(tmp.board, t.board,
+                   (BOARD_HEIGHT + BOARD_BUFFER) * sizeof(unsigned char)) ==
+            0) {
+            is_game_over = tetris_spawn(&t);
+        }
+
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            uint8_t addr = i / 8;
+            uint8_t index = i + BOARD_BUFFER;
+            uint8_t row = i % 8;
+            led_controller_set_row(&controller, addr, row, t.board[index]);
+        }
+
+        if (is_game_over) {
+            tetris_init(&t);
+            for (int i = 0; i < NUM_DEVICES; i++) {
+                led_controller_clear_display(&controller, i);
+            }
         }
 
         _delay_ms(1000);

@@ -4,6 +4,8 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#define BOARD_HEIGHT 16
+#define TETRIS_IMPLEMENTATION
 #include "tetris.h"
 
 int tetris_rand_int(int max) {
