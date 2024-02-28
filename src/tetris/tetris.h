@@ -4,7 +4,9 @@
 #include <stdint.h>
 
 #define BOARD_WIDTH sizeof(uint8_t) * 8
+#ifndef BOARD_HEIGHT
 #define BOARD_HEIGHT 12
+#endif
 #define BOARD_BUFFER 4
 
 enum move {
