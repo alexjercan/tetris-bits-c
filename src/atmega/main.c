@@ -1,5 +1,5 @@
 #include <string.h>
-#define BOARD_HEIGHT 16
+#define BOARD_HEIGHT 8
 #define TETRIS_IMPLEMENTATION
 #include "tetris.h"
 #include <avr/io.h>
@@ -11,7 +11,7 @@
 #define CS_PIN PB3
 #define CLK_PIN PB4
 
-#define NUM_DEVICES (BOARD_HEIGHT / 8)
+#define NUM_DEVICES 1
 
 uint8_t buffer[2 * NUM_DEVICES];
 
@@ -182,11 +182,9 @@ int main() {
     led_controller_init(&controller, &DDRB, &PORTB, DIN_PIN, CS_PIN, CLK_PIN,
                         NUM_DEVICES, buffer);
 
-    for (int i = 0; i < NUM_DEVICES; i++) {
-        led_controller_shutdown(&controller, i, 0);
-        led_controller_set_intensity(&controller, i, 8);
-        led_controller_clear_display(&controller, i);
-    }
+    led_controller_shutdown(&controller, 0, 0);
+    led_controller_set_intensity(&controller, 0, 8);
+    led_controller_clear_display(&controller, 0);
 
     tetris_init(&t);
 
@@ -208,17 +206,12 @@ int main() {
         }
 
         for (int i = 0; i < BOARD_HEIGHT; i++) {
-            uint8_t addr = i / 8;
-            uint8_t index = i + BOARD_BUFFER;
-            uint8_t row = i % 8;
-            led_controller_set_row(&controller, addr, row, t.board[index]);
+            led_controller_set_row(&controller, 0, i, t.board[i + BOARD_BUFFER]);
         }
 
         if (is_game_over) {
             tetris_init(&t);
-            for (int i = 0; i < NUM_DEVICES; i++) {
-                led_controller_clear_display(&controller, i);
-            }
+            led_controller_clear_display(&controller, 0);
         }
 
         _delay_ms(1000);
