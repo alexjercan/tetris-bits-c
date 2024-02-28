@@ -1,5 +1,7 @@
+#define NUM_DEVICES 1
+
 #include <string.h>
-#define BOARD_HEIGHT 8
+#define BOARD_HEIGHT (8 * NUM_DEVICES)
 #define TETRIS_IMPLEMENTATION
 #include "tetris.h"
 #include <avr/io.h>
@@ -10,8 +12,6 @@
 #define DIN_PIN PB2
 #define CS_PIN PB3
 #define CLK_PIN PB4
-
-#define NUM_DEVICES 1
 
 uint8_t buffer[2 * NUM_DEVICES];
 
