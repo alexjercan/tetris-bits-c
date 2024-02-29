@@ -1,4 +1,6 @@
-#define NUM_DEVICES 1
+#define TARGET_FPS 10
+#define DELAY_MS (1000.0 / TARGET_FPS)
+#define NUM_DEVICES 2
 
 #include <string.h>
 #define BOARD_HEIGHT (8 * NUM_DEVICES)
@@ -11,6 +13,8 @@
 #define LC_IMPLEMENTATION
 #include "lc.h"
 
+#define RBUTTON_PIN PB0
+#define LBUTTON_PIN PB1
 #define DIN_PIN PB2
 #define CS_PIN PB3
 #define CLK_PIN PB4
@@ -24,37 +28,46 @@ struct tetris tmp;
 struct led_controller controller;
 
 int main() {
-    // TODO: Setup the board with all components
     int is_game_over = 0;
 
-    // TODO: Make this work with multiple devices
+    // Led matrix setup
     lc_init(&controller, &DDRB, &PORTB, DIN_PIN, CS_PIN, CLK_PIN, NUM_DEVICES,
             buffer);
 
-    lc_shutdown(&controller, 0, 0);
-    lc_set_intensity(&controller, 0, 8);
-    lc_clear_display(&controller, 0);
+    for (uint8_t i = 0; i < NUM_DEVICES; i++) {
+        lc_shutdown(&controller, i, 0);
+        lc_set_intensity(&controller, i, 4);
+        lc_clear_display(&controller, i);
+    }
 
+    // Input setup
+    DDRB &= ~_BV(RBUTTON_PIN);
+    DDRB &= ~_BV(LBUTTON_PIN);
+
+    // Tetris setup
     tetris_init(&t);
 
     while (1) {
         tmp = t;
 
-        // TODO: Get movement from buttons
+        int left_button = (PINB & _BV(LBUTTON_PIN)) != 0;
+        int right_button = (PINB & _BV(RBUTTON_PIN)) != 0;
+        int input = right_button - left_button;
         enum move m = MOVE_NONE;
-        if (tetris_rand_int(2) == 0) {
-            m = MOVE_LEFT;
-        } else {
+        if (input > 0) {
             m = MOVE_RIGHT;
+        } else if (input < 0) {
+            m = MOVE_LEFT;
         }
+
         tetris_tick(&t, m);
 
         if (memcmp(tmp.board, t.board, (BOARD_HEIGHT + BOARD_BUFFER)) == 0) {
             is_game_over = tetris_spawn(&t);
         }
 
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            lc_set_row(&controller, 0, i, t.board[i + BOARD_BUFFER]);
+        for (uint8_t i = 0; i < BOARD_HEIGHT; i++) {
+            lc_set_row(&controller, i / 8, i % 8, t.board[i + BOARD_BUFFER]);
         }
 
         if (is_game_over) {
@@ -63,7 +76,7 @@ int main() {
             is_game_over = 0;
         }
 
-        _delay_ms(1000);
+        _delay_ms(DELAY_MS);
     }
 
     return 0;
