@@ -6,6 +6,7 @@
 #define BOARD_HEIGHT (8 * NUM_DEVICES)
 #define TETRIS_IMPLEMENTATION
 #include "tetris.h"
+#include <avr/interrupt.h>
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -23,9 +24,13 @@ uint8_t buffer[2 * NUM_DEVICES];
 
 int tetris_rand_int(int max) { return rand() % max; }
 
+volatile int input = 0;
 struct tetris t;
 struct tetris tmp;
 struct led_controller controller;
+
+ISR(INT0_vect) { input = -1; }
+ISR(INT1_vect) { input = 1; }
 
 int main() {
     int is_game_over = 0;
@@ -40,25 +45,25 @@ int main() {
         lc_clear_display(&controller, i);
     }
 
-    // Input setup
-    DDRB &= ~_BV(RBUTTON_PIN);
-    DDRB &= ~_BV(LBUTTON_PIN);
-
     // Tetris setup
     tetris_init(&t);
+
+    // Input setup
+    EICRA |= _BV(ISC00) | _BV(ISC01) | _BV(ISC10) | _BV(ISC11);
+    EIMSK |= _BV(INT0) | _BV(INT1);
+
+    sei();
 
     while (1) {
         tmp = t;
 
-        int left_button = (PINB & _BV(LBUTTON_PIN)) != 0;
-        int right_button = (PINB & _BV(RBUTTON_PIN)) != 0;
-        int input = right_button - left_button;
         enum move m = MOVE_NONE;
         if (input > 0) {
             m = MOVE_RIGHT;
         } else if (input < 0) {
             m = MOVE_LEFT;
         }
+        input = 0;
 
         tetris_tick(&t, m);
 
